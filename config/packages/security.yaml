@@ -9,7 +9,7 @@ security:
     providers:
         mysql_provider:
             entity:
-                class: App\Entity\User
+                class: App\Containers\UserContainer\Data\Entities\User
                 property: email.value
         users_in_memory:
             memory: null

@@ -14,17 +14,17 @@ doctrine:
             Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
         auto_mapping: true
         mappings:
-            App:
+            Containers:
                 type: attribute
                 is_bundle: false
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'App\Entity'
-                alias: App
+                dir: '%kernel.project_dir%/src/Containers'
+                prefix: 'App\Containers'
+                alias: Containers
             ValueObject:
                 type: attribute
                 is_bundle: false
-                dir: '%kernel.project_dir%/src/ValueObject'
-                prefix: 'App\ValueObject'
+                dir: '%kernel.project_dir%/src/Ship/ValueObjects'
+                prefix: 'App\Ship\ValueObjects'
 
 when@test:
     doctrine:
