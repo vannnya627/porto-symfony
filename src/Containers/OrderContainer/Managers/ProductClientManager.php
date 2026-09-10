@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Containers\CartContainer\Managers;
+namespace App\Containers\OrderContainer\Managers;
 
 use App\Containers\ProductContainer\Data\Entities\Product;
 use App\Containers\ProductContainer\Managers\Interfaces\ProductServerManagerInterface;
@@ -13,11 +13,6 @@ final readonly class ProductClientManager extends Manager
     public function __construct(
         private ProductServerManagerInterface $productServerManager,
     ) {}
-
-    public function getProductById(int $productId): Product
-    {
-        return $this->productServerManager->getProductById($productId);
-    }
 
     /**
      * @param array<int> $productIds

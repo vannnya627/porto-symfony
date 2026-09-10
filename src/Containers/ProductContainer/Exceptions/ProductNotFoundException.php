@@ -8,7 +8,7 @@ use App\Ship\Parents\Exceptions\Exception;
 
 final class ProductNotFoundException extends Exception
 {
-    public function __construct(private readonly int $productId)
+    public function __construct(private readonly mixed $productId)
     {
         parent::__construct('Продукт не знайдено');
     }

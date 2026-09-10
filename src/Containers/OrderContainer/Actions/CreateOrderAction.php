@@ -4,45 +4,56 @@ declare(strict_types=1);
 
 namespace App\Containers\OrderContainer\Actions;
 
+use App\Containers\CartContainer\Data\Entities\CartItem;
 use App\Containers\OrderContainer\Data\Entities\Order;
+use App\Containers\OrderContainer\DTOs\OrderDTO;
+use App\Containers\OrderContainer\DTOs\OrderItemDTO;
+use App\Containers\OrderContainer\Events\OrderCreatedEvent;
 use App\Containers\OrderContainer\Exceptions\EmptyCartException;
 use App\Containers\OrderContainer\Managers\CartClientManager;
-use App\Containers\OrderContainer\Managers\UserClientManager;
-use App\Containers\OrderContainer\Tasks\CommitOrderTask;
-use App\Containers\OrderContainer\Tasks\SaveOrderTask;
+use App\Containers\OrderContainer\Managers\ProductClientManager;
+use App\Containers\OrderContainer\Tasks\SaveAndCommitOrderTask;
 use App\Ship\Parents\Actions\Action;
-use App\Ship\ValueObjects\Email;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 final readonly class CreateOrderAction extends Action
 {
     public function __construct(
-        private UserClientManager $userClientManager,
         private CartClientManager $cartClientManager,
-        private SaveOrderTask $saveOrderTask,
-        private CommitOrderTask $commitOrderTask,
+        private ProductClientManager $productClientManager,
+        private SaveAndCommitOrderTask $saveAndCommitOrderTask,
+        private EventDispatcherInterface $eventDispatcher,
     ) {}
 
-    public function run(Email $email): Order
+    public function run(int $userId): OrderDTO
     {
-        $user = $this->userClientManager->getUserByEmail($email);
-        $cart = $this->cartClientManager->findCartWithItemsAndProducts($user);
+        $cart = $this->cartClientManager->findCartWithItemsTask($userId);
 
         if (null === $cart || $cart->cartItems->isEmpty()) {
             throw new EmptyCartException($cart?->id);
         }
-        $order = Order::create($user);
+        $order = Order::create($userId);
 
+        $productIds = $cart->cartItems->map(fn(CartItem $cartItem) => $cartItem->productId)->toArray();
+        $productsDictionary = array_column($this->productClientManager->getProductsByIds($productIds), null, 'id');
+
+        $orderItemDTOs = [];
         foreach ($cart->cartItems as $cartItem) {
-            $order->addItem($cartItem->product, $cartItem->quantity);
+            $product = $productsDictionary[$cartItem->productId] ?? null;
+            if (null !== $product) {
+                $order->addItem($cartItem->productId, $product->name, $cartItem->quantity, $product->price);
+                $orderItemDTOs[] = new OrderItemDTO(
+                    productId: $product->id,
+                    productName: $product->name,
+                    quantity: $cartItem->quantity,
+                    price: $product->price,
+                );
+            }
         }
 
-        $cart->clear();
+        $this->saveAndCommitOrderTask->run($order);
+        $this->eventDispatcher->dispatch(new OrderCreatedEvent($userId));
 
-        $this->saveOrderTask->run($order);
-        $this->cartClientManager->saveCart($cart);
-
-        $this->commitOrderTask->run();
-
-        return $order;
+        return new OrderDTO(id: $order->id, totalPrice: $order->totalPrice, status: $order->status, orderItemDTOs: $orderItemDTOs);
     }
 }

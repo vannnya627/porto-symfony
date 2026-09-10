@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Containers\OrderContainer\Data\Entities;
 
 use App\Containers\OrderContainer\Enum\OrderStatus;
-use App\Containers\ProductContainer\Data\Entities\Product;
-use App\Containers\UserContainer\Data\Entities\User;
 use App\Ship\Parents\Entities\Entity;
+use App\Ship\ValueObjects\Price;
 use App\Ship\ValueObjects\Quantity;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,9 +24,8 @@ final class Order extends Entity
     #[ORM\Column]
     public private(set) int $id;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'orders')]
-    #[ORM\JoinColumn(nullable: false)]
-    public private(set) ?User $user = null;
+    #[ORM\Column]
+    public private(set) int $userId;
 
     #[ORM\Column(nullable: false)]
     public private(set) int $totalPrice {
@@ -93,17 +91,17 @@ final class Order extends Entity
         $this->totalPrice = $total;
     }
 
-    public static function create(User $user): static
+    public static function create(int $userId): static
     {
         $order = new self();
-        $order->user = $user;
+        $order->userId = $userId;
 
         return $order;
     }
 
-    public function addItem(Product $product, Quantity $quantity): void
+    public function addItem(int $productId, string $productName, Quantity $quantity, Price $price): void
     {
-        $orderItem = OrderItem::create($this, $product, $quantity);
+        $orderItem = OrderItem::create($this, $productId, $productName, $quantity, $price);
 
         $this->orderItems->add($orderItem);
 

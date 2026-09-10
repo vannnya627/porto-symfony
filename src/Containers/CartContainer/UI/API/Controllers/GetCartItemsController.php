@@ -8,13 +8,13 @@ use App\Containers\CartContainer\Actions\GetCartItemsAction;
 use App\Containers\CartContainer\UI\API\Transformers\CartItemTransformer;
 use App\Containers\ProductContainer\UI\API\Responses\ProductResponse;
 use App\Ship\Attributes\RateLimiter;
+use App\Ship\Interfaces\AuthUserInterface;
 use App\Ship\Parents\Controllers\ApiController;
-use App\Ship\ValueObjects\Email;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 #[OA\Tag('CartController')]
 #[RateLimiter(policy: 'jwt')]
@@ -51,16 +51,11 @@ final class GetCartItemsController extends ApiController
             ],
         ),
     )]
-    public function __invoke(): JsonResponse
+    public function __invoke(#[CurrentUser] AuthUserInterface $user): JsonResponse
     {
-        $emailStr = $this->getUser()?->getUserIdentifier();
-        if (!$emailStr) {
-            throw new UnauthorizedHttpException('Bearer', 'Користувач не авторизований');
-        }
+        $cartItemsDTos = $this->action->run($user->getId());
 
-        $cart = $this->action->run(Email::create($emailStr));
-        // TODO може бути 1+n перевірити
-        $response = $cart ? array_map($this->transformer->run(...), $cart->cartItems->toArray()) : null;
+        $response = array_map($this->transformer->run(...), $cartItemsDTos);
 
         return $this->json(['data' => $response]);
     }

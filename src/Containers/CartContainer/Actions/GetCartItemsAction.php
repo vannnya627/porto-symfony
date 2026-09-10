@@ -4,28 +4,43 @@ declare(strict_types=1);
 
 namespace App\Containers\CartContainer\Actions;
 
-use App\Containers\CartContainer\Data\Entities\Cart;
-use App\Containers\CartContainer\Managers\UserClientManager;
-use App\Containers\CartContainer\Tasks\FindCartWithItemsAndProductsTask;
+use App\Containers\CartContainer\Data\Entities\CartItem;
+use App\Containers\CartContainer\DTOs\CartItemDTO;
+use App\Containers\CartContainer\Managers\ProductClientManager;
+use App\Containers\CartContainer\Tasks\FindCartWithItemsTask;
 use App\Ship\Parents\Actions\Action;
-use App\Ship\ValueObjects\Email;
 
 final readonly class GetCartItemsAction extends Action
 {
     public function __construct(
-        private UserClientManager $userClientManager,
-        private FindCartWithItemsAndProductsTask $findCartWithItemsAndProductsTask,
+        private FindCartWithItemsTask $findCartWithItemsTask,
+        private ProductClientManager $productClientManager,
     ) {}
 
-    public function run(Email $email): ?Cart
+    /**
+     * @return list<CartItemDTO>
+     */
+    public function run(int $userId): array
     {
-        $user = $this->userClientManager->getUserByEmail($email);
-        $cart = $this->findCartWithItemsAndProductsTask->run($user);
+        $cart = $this->findCartWithItemsTask->run($userId);
 
         if (null === $cart || $cart->cartItems->isEmpty()) {
-            return null;
+            return [];
         }
 
-        return $cart;
+        $productIds = $cart->cartItems->map(fn(CartItem $cartItem) => $cartItem->productId)->toArray();
+
+        $productsDictionary = array_column($this->productClientManager->getProductsByIds($productIds), null, 'id');
+
+        $cartItemDTOs = [];
+        foreach ($cart->cartItems as $cartItem) {
+            $product = $productsDictionary[$cartItem->productId] ?? null;
+
+            if (null !== $product) {
+                $cartItemDTOs[] = new CartItemDTO(productId: $product->id, productName: $product->name, quantity: $cartItem->quantity);
+            }
+        }
+
+        return $cartItemDTOs;
     }
 }

@@ -25,15 +25,13 @@ final class OrderRepository extends Repository implements OrderRepositoryInterfa
     /**
      * @return list<Order>
      */
-    public function findAllByUserIdWithProduct(int $userId): array
+    public function findOrdersByUserId(int $userId): array
     {
         /** @var list<Order> $result */
         $result = $this->createQueryBuilder('o')
             ->leftJoin('o.orderItems', 'oi')
             ->addSelect('oi')
-            ->leftJoin('oi.product', 'p')
-            ->addSelect('p')
-            ->where('o.user = :user_id')
+            ->where('o.userId = :user_id')
             ->setParameter('user_id', $userId)
             ->orderBy('o.id', 'DESC')
             ->getQuery()

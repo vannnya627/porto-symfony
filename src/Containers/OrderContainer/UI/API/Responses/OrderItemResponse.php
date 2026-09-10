@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Containers\OrderContainer\UI\API\Responses;
 
-use App\Containers\OrderContainer\Data\Entities\OrderItem;
+use App\Containers\OrderContainer\DTOs\OrderItemDTO;
 
 final readonly class OrderItemResponse
 {
@@ -15,13 +15,13 @@ final readonly class OrderItemResponse
         public int $price,
     ) {}
 
-    public static function create(OrderItem $orderItem): self
+    public static function create(OrderItemDTO $orderItemDTO): self
     {
         return new self(
-            productId: $orderItem->product->id,
-            productName: $orderItem->product->name,
-            quantity: $orderItem->quantity->value,
-            price: $orderItem->price->value,
+            productId: $orderItemDTO->productId,
+            productName: $orderItemDTO->productName,
+            quantity: $orderItemDTO->quantity->value,
+            price: $orderItemDTO->price->value,
         );
     }
 }

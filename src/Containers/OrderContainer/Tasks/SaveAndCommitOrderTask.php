@@ -8,17 +8,14 @@ use App\Containers\OrderContainer\Data\Entities\Order;
 use App\Containers\OrderContainer\Data\Repositories\Interfaces\OrderRepositoryInterface;
 use App\Ship\Parents\Tasks\Task;
 
-final readonly class FindOrdersByUserIdWithProductTask extends Task
+final readonly class SaveAndCommitOrderTask extends Task
 {
     public function __construct(
         private OrderRepositoryInterface $repository,
     ) {}
 
-    /**
-     * @return list<Order>
-     */
-    public function run(int $userId): array
+    public function run(Order $order): void
     {
-        return $this->repository->findAllByUserIdWithProduct($userId);
+        $this->repository->saveAndCommit($order);
     }
 }

@@ -35,4 +35,24 @@ final class ProductRepository extends Repository implements ProductRepositoryInt
     {
         return $this->findAll();
     }
+
+    /**
+     * @return list<Product>
+     */
+    public function getProductsByIds(array $productIds): array
+    {
+        $products = $this->findBy(['id' => $productIds]);
+
+        // 2. Якщо знайшли менше, ніж просили — значить якихось продуктів не існує
+        if (count($products) !== count($productIds)) {
+            // Знаходимо, яких саме ID не вистачає (опціонально, для гарної помилки)
+            $foundIds = array_map(fn(Product $p) => $p->id, $products);
+            $missingIds = array_diff($productIds, $foundIds);
+
+            // Тут доведеться змінити ваш Exception, щоб він приймав масив зниклих ID, а не один int
+            throw new ProductNotFoundException($missingIds);
+        }
+
+        return $products;
+    }
 }

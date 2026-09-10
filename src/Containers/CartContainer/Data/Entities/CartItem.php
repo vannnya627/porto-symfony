@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Containers\CartContainer\Data\Entities;
 
-use App\Containers\ProductContainer\Data\Entities\Product;
 use App\Ship\Parents\Entities\Entity;
 use App\Ship\ValueObjects\Quantity;
 use Doctrine\ORM\Mapping as ORM;
@@ -21,9 +20,8 @@ final class CartItem extends Entity
     #[ORM\JoinColumn(nullable: false)]
     public private(set) Cart $cart;
 
-    #[ORM\ManyToOne(targetEntity: Product::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    public private(set) Product $product;
+    #[ORM\Column]
+    public private(set) int $productId;
 
     #[ORM\Embedded(class: Quantity::class, columnPrefix: false)]
     public private(set) Quantity $quantity;
@@ -35,11 +33,11 @@ final class CartItem extends Entity
         $this->quantity = $this->quantity->add($newQuantity);
     }
 
-    public static function create(Cart $cart, Product $product, Quantity $quantity): static
+    public static function create(Cart $cart, int $productId, Quantity $quantity): static
     {
         $cartItem = new self();
         $cartItem->cart = $cart;
-        $cartItem->product = $product;
+        $cartItem->productId = $productId;
         $cartItem->quantity = $quantity;
 
         return $cartItem;

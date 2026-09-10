@@ -9,13 +9,13 @@ use App\Containers\OrderContainer\UI\API\Responses\OrderResponse;
 use App\Containers\OrderContainer\UI\API\Transformers\OrderTransformer;
 use App\Ship\Attributes\RateLimiter;
 use App\Ship\DTO\ErrorResponseDTO;
+use App\Ship\Interfaces\AuthUserInterface;
 use App\Ship\Parents\Controllers\ApiController;
-use App\Ship\ValueObjects\Email;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Throwable;
 
 #[OA\Tag('OrderController')]
@@ -56,15 +56,10 @@ final class CreateOrderController extends ApiController
             ],
         ),
     )]
-    public function __invoke(): JsonResponse
+    public function __invoke(#[CurrentUser] AuthUserInterface $user): JsonResponse
     {
-        $emailStr = $this->getUser()?->getUserIdentifier();
-        if (!$emailStr) {
-            throw new UnauthorizedHttpException('Bearer', 'Користувач не авторизований');
-        }
+        $orderDTO = $this->action->run($user->getId());
 
-        $order = $this->action->run(Email::create($emailStr));
-
-        return $this->json($this->transformer->run($order));
+        return $this->json($this->transformer->run($orderDTO));
     }
 }

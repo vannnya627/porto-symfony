@@ -22,4 +22,11 @@ interface ProductRepositoryInterface
     public function findProducts(): array;
 
     public function removeAndCommit(Product $product): void;
+
+    /**
+     * @param array<int> $productIds
+     *
+     * @return list<Product>
+     */
+    public function getProductsByIds(array $productIds): array;
 }

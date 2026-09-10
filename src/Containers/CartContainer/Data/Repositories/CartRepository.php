@@ -6,7 +6,6 @@ namespace App\Containers\CartContainer\Data\Repositories;
 
 use App\Containers\CartContainer\Data\Entities\Cart;
 use App\Containers\CartContainer\Data\Repositories\Interfaces\CartRepositoryInterface;
-use App\Containers\UserContainer\Data\Entities\User;
 use App\Ship\Parents\Repositories\Repository;
 use App\Ship\Traits\RepositorySupportTrait;
 use Doctrine\Persistence\ManagerRegistry;
@@ -25,19 +24,17 @@ final class CartRepository extends Repository implements CartRepositoryInterface
 
     public function findByUserId(int $userId): ?Cart
     {
-        return $this->findOneBy(['user' => $userId]);
+        return $this->findOneBy(['userId' => $userId]);
     }
 
-    public function findCartWithItemsAndProducts(User $user): ?Cart
+    public function findCartWithItems(int $userId): ?Cart
     {
         /** @var Cart|null $result */
         $result = $this->createQueryBuilder('c')
             ->leftJoin('c.cartItems', 'ci')
             ->addSelect('ci')
-            ->leftJoin('ci.product', 'p')
-            ->addSelect('p')
-            ->where('c.user = :user')
-            ->setParameter('user', $user)
+            ->where('c.userId = :user_id')
+            ->setParameter('user_id', $userId)
             ->getQuery()
             ->getOneOrNullResult();
 

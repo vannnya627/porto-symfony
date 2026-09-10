@@ -4,26 +4,45 @@ declare(strict_types=1);
 
 namespace App\Containers\OrderContainer\Actions;
 
-use App\Containers\OrderContainer\Data\Entities\Order;
-use App\Containers\OrderContainer\Managers\UserClientManager;
-use App\Containers\OrderContainer\Tasks\FindOrdersByUserIdWithProductTask;
+use App\Containers\OrderContainer\DTOs\OrderDTO;
+use App\Containers\OrderContainer\DTOs\OrderItemDTO;
+use App\Containers\OrderContainer\Tasks\FindOrdersByUserIdTask;
 use App\Ship\Parents\Actions\Action;
-use App\Ship\ValueObjects\Email;
 
 final readonly class GetOrdersAction extends Action
 {
     public function __construct(
-        private UserClientManager $userClientManager,
-        private FindOrdersByUserIdWithProductTask $findOrdersByUserIdWithProductTask,
+        private FindOrdersByUserIdTask $findOrdersByUserIdTask,
     ) {}
 
     /**
-     * @return list<Order>
+     * @return list<OrderDTO>
      */
-    public function run(Email $email): array
+    public function run(int $userId): array
     {
-        $user = $this->userClientManager->getUserByEmail($email);
+        $orders = $this->findOrdersByUserIdTask->run($userId);
 
-        return $this->findOrdersByUserIdWithProductTask->run($user->id);
+        $orderDTOs = [];
+        foreach ($orders as $order) {
+            $orderItemDTOs = [];
+
+            foreach ($order->orderItems as $item) {
+                $orderItemDTOs[] = new OrderItemDTO(
+                    productId: $item->productId,
+                    productName: $item->productName,
+                    quantity: $item->quantity,
+                    price: $item->price,
+                );
+            }
+
+            $orderDTOs[] = new OrderDTO(
+                id: $order->id,
+                totalPrice: $order->totalPrice,
+                status: $order->status,
+                orderItemDTOs: $orderItemDTOs,
+            );
+        }
+
+        return $orderDTOs;
     }
 }

@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Containers\UserContainer\Data\Entities;
 
-use App\Containers\CartContainer\Data\Entities\Cart;
-use App\Containers\OrderContainer\Data\Entities\Order;
+use App\Ship\Interfaces\AuthUserInterface;
 use App\Ship\Parents\Entities\Entity;
 use App\Ship\ValueObjects\Email;
 use DateTimeImmutable;
 use Deprecated;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -21,7 +18,7 @@ use function assert;
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email.value'])]
-final class User extends Entity implements UserInterface, PasswordAuthenticatedUserInterface
+final class User extends Entity implements AuthUserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -49,19 +46,7 @@ final class User extends Entity implements UserInterface, PasswordAuthenticatedU
     #[ORM\Column]
     public private(set) ?DateTimeImmutable $updatedAt = null;
 
-    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
-    public private(set) ?Cart $cart = null;
-
-    /**
-     * @var Collection<int, Order>
-     */
-    #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'user')]
-    public private(set) Collection $orders;
-
-    private function __construct()
-    {
-        $this->orders = new ArrayCollection();
-    }
+    private function __construct() {}
 
     /**
      * A visual identifier that represents this user.
@@ -121,22 +106,6 @@ final class User extends Entity implements UserInterface, PasswordAuthenticatedU
         $this->updatedAt = new DateTimeImmutable();
     }
 
-    public function addOrder(Order $order): static
-    {
-        if (!$this->orders->contains($order)) {
-            $this->orders->add($order);
-        }
-
-        return $this;
-    }
-
-    public function removeOrder(Order $order): static
-    {
-        $this->orders->removeElement($order);
-
-        return $this;
-    }
-
     public static function createCustomer(Email $email, string $passwordHash): self
     {
         $user = new self();
@@ -147,8 +116,8 @@ final class User extends Entity implements UserInterface, PasswordAuthenticatedU
         return $user;
     }
 
-    public function addCart(Cart $cart): void
+    public function getId(): int
     {
-        $this->cart = $cart;
+        return $this->id;
     }
 }

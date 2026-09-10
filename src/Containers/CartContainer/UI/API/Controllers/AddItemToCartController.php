@@ -9,14 +9,15 @@ use App\Containers\CartContainer\UI\API\Requests\AddItemRequest;
 use App\Containers\CartContainer\Values\AddCartItemValue;
 use App\Ship\Attributes\RateLimiter;
 use App\Ship\DTO\ErrorResponseDTO;
+use App\Ship\Interfaces\AuthUserInterface;
 use App\Ship\Parents\Controllers\ApiController;
-use App\Ship\ValueObjects\Email;
+use App\Ship\ValueObjects\Quantity;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 #[OA\Tag('CartController')]
 #[RateLimiter(policy: 'jwt')]
@@ -58,19 +59,13 @@ final class AddItemToCartController extends ApiController
             ],
         ),
     )]
-    public function __invoke(#[MapRequestPayload] AddItemRequest $request): JsonResponse
+    public function __invoke(#[MapRequestPayload] AddItemRequest $request, #[CurrentUser] AuthUserInterface $user): JsonResponse
     {
-        // TODO можливо винести
-        $emailStr = $this->getUser()?->getUserIdentifier();
-        if (!$emailStr) {
-            throw new UnauthorizedHttpException('Bearer', 'Користувач не авторизований');
-        }
-
         $this->action->run(
             AddCartItemValue::create(
-                userEmail: Email::create($emailStr),
+                userId: $user->getId(),
                 productId: $request->productId,
-                quantity: $request->quantity,
+                quantity: Quantity::create($request->quantity),
             ),
         );
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Containers\OrderContainer\Data\Entities;
 
-use App\Containers\ProductContainer\Data\Entities\Product;
 use App\Ship\Parents\Entities\Entity;
 use App\Ship\ValueObjects\Price;
 use App\Ship\ValueObjects\Quantity;
@@ -22,9 +21,11 @@ final class OrderItem extends Entity
     #[ORM\JoinColumn(nullable: false)]
     public private(set) Order $order;
 
-    #[ORM\ManyToOne(targetEntity: Product::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    public private(set) Product $product;
+    #[ORM\Column]
+    public private(set) int $productId;
+
+    #[ORM\Column]
+    public private(set) string $productName;
 
     #[ORM\Embedded(class: Quantity::class, columnPrefix: false)]
     public private(set) Quantity $quantity;
@@ -34,13 +35,14 @@ final class OrderItem extends Entity
 
     private function __construct() {}
 
-    public static function create(Order $order, Product $product, Quantity $quantity): static
+    public static function create(Order $order, int $productId, string $productName, Quantity $quantity, Price $price): static
     {
         $orderItem = new self();
         $orderItem->order = $order;
-        $orderItem->product = $product;
+        $orderItem->productId = $productId;
+        $orderItem->productName = $productName;
         $orderItem->quantity = $quantity;
-        $orderItem->price = $product->price;
+        $orderItem->price = $price;
 
         return $orderItem;
     }

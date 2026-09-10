@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Containers\CartContainer\Data\Entities;
 
-use App\Containers\ProductContainer\Data\Entities\Product;
-use App\Containers\UserContainer\Data\Entities\User;
 use App\Ship\Parents\Entities\Entity;
 use App\Ship\ValueObjects\Quantity;
 use DateTimeImmutable;
@@ -22,9 +20,8 @@ final class Cart extends Entity
     #[ORM\Column]
     public private(set) int $id;
 
-    #[ORM\OneToOne(inversedBy: 'cart', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    public private(set) User $user;
+    #[ORM\Column]
+    public private(set) int $userId;
 
     #[ORM\Column]
     public private(set) ?DateTimeImmutable $createdAt = null;
@@ -49,10 +46,10 @@ final class Cart extends Entity
         $this->cartItems = new ArrayCollection();
     }
 
-    public static function create(User $user): static
+    public static function create(int $userId): static
     {
         $cart = new self();
-        $cart->user = $user;
+        $cart->userId = $userId;
 
         return $cart;
     }
@@ -84,10 +81,10 @@ final class Cart extends Entity
         return $this;
     }
 
-    private function getItemForProduct(Product $product): ?CartItem
+    private function getItemByProductId(int $productId): ?CartItem
     {
         foreach ($this->cartItems as $item) {
-            if ($item->product === $product) {
+            if ($item->productId === $productId) {
                 return $item;
             }
         }
@@ -95,14 +92,14 @@ final class Cart extends Entity
         return null;
     }
 
-    public function addItem(Product $product, Quantity $quantity): static
+    public function addItem(int $productId, Quantity $quantity): static
     {
-        $existingItem = $this->getItemForProduct($product);
+        $existingItem = $this->getItemByProductId($productId);
 
         if (null !== $existingItem) {
             $existingItem->addQuantity($quantity);
         } else {
-            $newItem = CartItem::create($this, $product, $quantity);
+            $newItem = CartItem::create($this, $productId, $quantity);
 
             $this->addCartItem($newItem);
         }

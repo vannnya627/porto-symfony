@@ -8,13 +8,13 @@ use App\Containers\OrderContainer\Actions\GetOrdersAction;
 use App\Containers\OrderContainer\UI\API\Responses\OrderResponse;
 use App\Containers\OrderContainer\UI\API\Transformers\OrderTransformer;
 use App\Ship\Attributes\RateLimiter;
+use App\Ship\Interfaces\AuthUserInterface;
 use App\Ship\Parents\Controllers\ApiController;
-use App\Ship\ValueObjects\Email;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 #[OA\Tag('OrderController')]
 #[RateLimiter(policy: 'jwt')]
@@ -51,14 +51,10 @@ final class GetOrdersController extends ApiController
             ],
         ),
     )]
-    public function __invoke(): JsonResponse
+    public function __invoke(#[CurrentUser] AuthUserInterface $user): JsonResponse
     {
-        $emailStr = $this->getUser()?->getUserIdentifier();
-        if (!$emailStr) {
-            throw new UnauthorizedHttpException('Bearer', 'Користувач не авторизований');
-        }
-        $orders = $this->action->run(Email::create($emailStr));
+        $orderDTOs = $this->action->run($user->getId());
 
-        return $this->json(['data' => array_map($this->transformer->run(...), $orders)]);
+        return $this->json(['data' => array_map($this->transformer->run(...), $orderDTOs)]);
     }
 }
