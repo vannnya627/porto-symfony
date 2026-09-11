@@ -12,6 +12,7 @@ use App\Containers\CartContainer\Tasks\SaveAndCommitCartTask;
 use App\Containers\CartContainer\Values\AddCartItemValue;
 use App\Containers\ProductContainer\Data\Entities\Product;
 use App\Containers\ProductContainer\Exceptions\ProductNotFoundException;
+use App\Containers\ProductContainer\Managers\PublicValues\ProductPublicValue;
 use App\Ship\ValueObjects\Price;
 use App\Ship\ValueObjects\Quantity;
 use App\Ship\Parents\Tests\AbstractTestCase;
@@ -53,10 +54,12 @@ final class AddCartItemToCartActionTest extends AbstractTestCase
         $product = Product::create(name: 'Test Product', description: 'Desc', price: Price::create(100));
         $this->setEntityId($product, $productId);
 
+        $productPublicValue = ProductPublicValue::create($product);
+
         $this->productClientManager->expects($this->once())
             ->method('getProductById')
             ->with($productId)
-            ->willReturn($product);
+            ->willReturn($productPublicValue);
 
         $cart = Cart::create($userId);
         $this->findCartByIdTask->expects($this->once())
@@ -89,10 +92,12 @@ final class AddCartItemToCartActionTest extends AbstractTestCase
         $product = Product::create(name: 'Test Product', description: 'Desc', price: Price::create(100));
         $this->setEntityId($product, $productId);
 
+        $productPublicValue = ProductPublicValue::create($product);
+
         $this->productClientManager->expects($this->once())
             ->method('getProductById')
             ->with($productId)
-            ->willReturn($product);
+            ->willReturn($productPublicValue);
 
         $this->findCartByIdTask->expects($this->once())
             ->method('run')
