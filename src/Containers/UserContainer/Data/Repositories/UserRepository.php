@@ -6,7 +6,6 @@ namespace App\Containers\UserContainer\Data\Repositories;
 
 use App\Containers\UserContainer\Data\Entities\User;
 use App\Containers\UserContainer\Data\Repositories\Interfaces\UserRepositoryInterface;
-use App\Containers\UserContainer\Exceptions\UserNotFoundException;
 use App\Ship\Parents\Repositories\Repository;
 use App\Ship\Traits\RepositorySupportTrait;
 use App\Ship\ValueObjects\Email;
@@ -44,10 +43,5 @@ final class UserRepository extends Repository implements PasswordUpgraderInterfa
     public function existByEmail(Email $email): bool
     {
         return $this->count(['email.value' => $email->value]) > 0;
-    }
-
-    public function getByEmail(Email $email): User
-    {
-        return $this->findOneBy(['email.value' => $email->value]) ?? throw new UserNotFoundException($email->value);
     }
 }

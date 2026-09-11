@@ -6,7 +6,6 @@ namespace App\Containers\ProductContainer\Actions;
 
 use App\Containers\ProductContainer\Data\Entities\Product;
 use App\Containers\ProductContainer\Tasks\GetAllProductTask;
-use App\Containers\ProductContainer\UI\API\Responses\ProductResponse;
 use App\Ship\Parents\Actions\Action;
 
 final readonly class GetProductsAction extends Action
@@ -21,6 +20,5 @@ final readonly class GetProductsAction extends Action
     public function run(): array
     {
         return $this->getAllProductTask->run();
-        // return array_map(callback: ProductResponse::create(...), array: $this->getAllProductTask->run());
     }
 }

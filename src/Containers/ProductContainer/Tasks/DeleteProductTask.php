@@ -8,7 +8,7 @@ use App\Containers\ProductContainer\Data\Entities\Product;
 use App\Containers\ProductContainer\Data\Repositories\Interfaces\ProductRepositoryInterface;
 use App\Ship\Parents\Tasks\Task;
 
-final readonly class DeleteProductTask extends Task
+readonly class DeleteProductTask extends Task
 {
     public function __construct(
         private ProductRepositoryInterface $repository,

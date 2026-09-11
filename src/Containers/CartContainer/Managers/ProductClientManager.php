@@ -8,7 +8,7 @@ use App\Containers\ProductContainer\Data\Entities\Product;
 use App\Containers\ProductContainer\Managers\Interfaces\ProductServerManagerInterface;
 use App\Ship\Parents\Managers\Manager;
 
-final readonly class ProductClientManager extends Manager
+readonly class ProductClientManager extends Manager
 {
     public function __construct(
         private ProductServerManagerInterface $productServerManager,

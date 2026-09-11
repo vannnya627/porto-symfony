@@ -9,6 +9,4 @@ use App\Containers\CartContainer\Data\Entities\Cart;
 interface CartServerManagerInterface
 {
     public function findCartWithItemsTask(int $userId): ?Cart;
-
-    public function saveCart(Cart $cart): void;
 }

@@ -4,4 +4,6 @@ parameters:
     level: 10
     paths:
         - src/
-        # - tests/
+    excludePaths:
+        - src/Containers/*/Tests/*
+        - src/Ship/Parents/Tests/*

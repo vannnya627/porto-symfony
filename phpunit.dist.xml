@@ -7,7 +7,7 @@
          failOnDeprecation="true"
          failOnNotice="true"
          failOnWarning="true"
-         bootstrap="tests/bootstrap.php"
+         bootstrap="src/Ship/Parents/Tests/bootstrap.php"
          cacheDirectory=".phpunit.cache"
 >
     <php>
@@ -16,12 +16,12 @@
         <server name="APP_ENV" value="test" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
 
-        <env name="KERNEL_CLASS" value="App\Kernel" />
+        <env name="KERNEL_CLASS" value="App\Ship\Core\Kernel" />
     </php>
 
     <testsuites>
         <testsuite name="Project Test Suite">
-            <directory>tests</directory>
+            <directory>src</directory>
         </testsuite>
     </testsuites>
 

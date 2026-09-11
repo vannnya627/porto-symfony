@@ -8,7 +8,7 @@ use App\Containers\UserContainer\Data\Repositories\Interfaces\UserRepositoryInte
 use App\Ship\Parents\Tasks\Task;
 use App\Ship\ValueObjects\Email;
 
-final readonly class ExistsUserByEmailTask extends Task
+readonly class ExistsUserByEmailTask extends Task
 {
     public function __construct(
         private UserRepositoryInterface $repository,

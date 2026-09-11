@@ -8,7 +8,7 @@ use App\Containers\ProductContainer\Data\Entities\Product;
 use App\Containers\ProductContainer\Data\Repositories\Interfaces\ProductRepositoryInterface;
 use App\Ship\Parents\Tasks\Task;
 
-final readonly class GetProductByIdTask extends Task
+readonly class GetProductByIdTask extends Task
 {
     public function __construct(
         private ProductRepositoryInterface $repository,

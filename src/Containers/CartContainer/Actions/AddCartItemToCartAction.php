@@ -22,6 +22,7 @@ final readonly class AddCartItemToCartAction extends Action
     public function run(AddCartItemValue $value): void
     {
         $userId = $value->userId;
+        // Todo змінити на ProductDTO(+test)
         $product = $this->productClientManager->getProductById($value->productId);
 
         $cart = $this->findCartByIdTask->run($userId);

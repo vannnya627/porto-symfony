@@ -8,7 +8,7 @@ use App\Containers\UserContainer\Data\Entities\User;
 use App\Containers\UserContainer\Data\Repositories\Interfaces\UserRepositoryInterface;
 use App\Ship\Parents\Tasks\Task;
 
-final readonly class SaveAndCommitUserTask extends Task
+readonly class SaveAndCommitUserTask extends Task
 {
     public function __construct(
         private UserRepositoryInterface $repository,

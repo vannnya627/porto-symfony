@@ -12,7 +12,6 @@ parameters:
         App\Containers\UserContainer\Exceptions\UserAlreadyExistsException: { type: 'user-already-exists', code: 409, loggable: false }
         App\Containers\ProductContainer\Exceptions\ProductNotFoundException: { type: 'product-not-found', code: 404, loggable: false }
         App\Containers\OrderContainer\Exceptions\EmptyCartException: { type: 'cart-is-empty', code: 422, loggable: false }
-        App\Containers\UserContainer\Exceptions\UserNotFoundException: { type: 'user-not-found', code: 404, loggable: false }
 
 services:
     # default configuration for services in *this* file
@@ -24,6 +23,9 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+        exclude:
+            - '../src/Ship/Parents/Tests/'
+            - '../src/Containers/*/Tests/'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

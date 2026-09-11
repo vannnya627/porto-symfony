@@ -8,7 +8,7 @@ use App\Containers\CartContainer\Data\Entities\Cart;
 use App\Containers\CartContainer\Data\Repositories\Interfaces\CartRepositoryInterface;
 use App\Ship\Parents\Tasks\Task;
 
-final readonly class FindCartWithItemsTask extends Task
+readonly class FindCartWithItemsTask extends Task
 {
     public function __construct(
         private CartRepositoryInterface $repository,

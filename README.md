@@ -1,6 +1,6 @@
 ### Clone project:
 ```
-git clone https://github.com/vannnya627/precoro-test.git
+git clone https://github.com/vannnya627/porto-symfony.git
 ```
 ---
 ### Start Docker containers:
@@ -43,11 +43,11 @@ docker compose exec php-fpm php bin/phpunit
 ### PCOV(one of command):
 
 ```
- docker compose exec php-fpm php -d pcov.enabled=1 vendor/bin/phpunit tests/ --coverage-html coverage_report/
+ docker compose exec php-fpm php -d pcov.enabled=1 vendor/bin/phpunit --coverage-html coverage_report/
 ```
 ### or
 ```
-docker compose exec php-fpm php -d pcov.enabled=1 vendor/bin/phpunit tests/ --coverage-text
+docker compose exec php-fpm php -d pcov.enabled=1 vendor/bin/phpunit --coverage-text
 ```
 ### Php-cs-fixer:
 ```

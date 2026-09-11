@@ -2,7 +2,7 @@ nelmio_api_doc:
     documentation:
         info:
             title:
-            description: Тестове завдання Precoro. REST API до інтернет-магазину.
+            description: REST API до інтернет-магазину.
             version: 1.0.0
         components:
             securitySchemes:

@@ -17,6 +17,7 @@ final readonly class ServerManager extends Manager implements ProductServerManag
         private GetProductsByIdsTask $getProductsByIdsTask,
     ) {}
 
+    // TODO зв'язки між контейнерами переробити на ДТО
     public function getProductById(int $productId): Product
     {
         return $this->getProductByIdTask->run($productId);

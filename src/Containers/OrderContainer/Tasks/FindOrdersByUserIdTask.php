@@ -8,7 +8,7 @@ use App\Containers\OrderContainer\Data\Entities\Order;
 use App\Containers\OrderContainer\Data\Repositories\Interfaces\OrderRepositoryInterface;
 use App\Ship\Parents\Tasks\Task;
 
-final readonly class FindOrdersByUserIdTask extends Task
+readonly class FindOrdersByUserIdTask extends Task
 {
     public function __construct(
         private OrderRepositoryInterface $repository,

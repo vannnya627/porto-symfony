@@ -8,7 +8,7 @@ use App\Containers\UserContainer\Data\Entities\User;
 use App\Ship\Parents\Tasks\Task;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
-final readonly class HashPasswordTask extends Task
+readonly class HashPasswordTask extends Task
 {
     public function __construct(
         private PasswordHasherFactoryInterface $passwordHasherFactory,
