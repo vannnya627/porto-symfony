@@ -6,6 +6,7 @@ namespace App\Containers\ProductContainer\UI\API\Controllers;
 
 use App\Containers\ProductContainer\Actions\GetProductAction;
 use App\Containers\ProductContainer\UI\API\Responses\ProductResponse;
+use App\Containers\ProductContainer\UI\API\Transformers\ProductTransformer;
 use App\Ship\Attributes\RateLimiter;
 use App\Ship\DTO\ErrorResponseDTO;
 use App\Ship\Parents\Controllers\ApiController;
@@ -19,7 +20,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/v1/product/{productId}', name: 'api_get_product', methods: ['GET'])]
 final class GetProductController extends ApiController
 {
-    public function __construct(private readonly GetProductAction $action) {}
+    public function __construct(
+        private readonly GetProductAction $action,
+        private readonly ProductTransformer $transformer,
+    ) {}
 
     #[OA\Get(
         operationId: 'api_get_product',
@@ -45,10 +49,8 @@ final class GetProductController extends ApiController
     )]
     public function __invoke(int $productId): JsonResponse
     {
-        $result = $this->action->run($productId);
+        $product = $this->action->run($productId);
 
-        $response = ProductResponse::create($result);
-
-        return $this->json($response);
+        return $this->json($this->transformer->transform($product));
     }
 }

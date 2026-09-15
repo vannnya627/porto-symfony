@@ -7,6 +7,7 @@ namespace App\Containers\ProductContainer\UI\API\Controllers;
 use App\Containers\ProductContainer\Actions\UpdateProductAction;
 use App\Containers\ProductContainer\UI\API\Requests\UpdateProductRequest;
 use App\Containers\ProductContainer\UI\API\Responses\ProductResponse;
+use App\Containers\ProductContainer\UI\API\Transformers\ProductTransformer;
 use App\Containers\ProductContainer\Values\UpdateProductValue;
 use App\Ship\Attributes\RateLimiter;
 use App\Ship\DTO\ErrorResponseDTO;
@@ -23,7 +24,10 @@ use Throwable;
 #[Route(path: '/api/v1/product/{productId}', name: 'api_update_product', methods: ['PATCH'])]
 final class UpdateProductController extends ApiController
 {
-    public function __construct(private readonly UpdateProductAction $action) {}
+    public function __construct(
+        private readonly UpdateProductAction $action,
+        private readonly ProductTransformer $transformer,
+    ) {}
 
     /**
      * @throws Throwable
@@ -58,8 +62,8 @@ final class UpdateProductController extends ApiController
     {
         $value = UpdateProductValue::create(name: $request->name, description: $request->description, price: $request->price);
 
-        $response = ProductResponse::create($this->action->run(productId: $productId, value: $value));
+        $product = $this->action->run(productId: $productId, value: $value);
 
-        return $this->json($response);
+        return $this->json($this->transformer->transform($product));
     }
 }

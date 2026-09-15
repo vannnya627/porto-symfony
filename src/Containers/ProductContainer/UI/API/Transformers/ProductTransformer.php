@@ -10,7 +10,7 @@ use App\Ship\Parents\Transformers\Transformer;
 
 final readonly class ProductTransformer extends Transformer
 {
-    public function run(Product $product): ProductResponse
+    public function transform(Product $product): ProductResponse
     {
         return  ProductResponse::create($product);
     }

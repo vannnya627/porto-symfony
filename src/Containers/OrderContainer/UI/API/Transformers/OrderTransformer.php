@@ -14,13 +14,13 @@ final readonly class OrderTransformer extends Transformer
         private OrderItemTransformer $orderItemTransformer,
     ) {}
 
-    public function run(OrderDTO $orderDTO): OrderResponse
+    public function transform(OrderDTO $orderDTO): OrderResponse
     {
         return new OrderResponse(
             id: $orderDTO->id,
             totalPrice: $orderDTO->totalPrice,
             status: $orderDTO->status->value,
-            orderItems: array_map($this->orderItemTransformer->run(...), $orderDTO->orderItemDTOs),
+            orderItems: array_map($this->orderItemTransformer->transform(...), $orderDTO->orderItemDTOs),
         );
     }
 }

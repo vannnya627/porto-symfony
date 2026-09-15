@@ -55,7 +55,7 @@ final class GetCartItemsController extends ApiController
     {
         $cartItemsDTos = $this->action->run($user->getId());
 
-        $response = array_map($this->transformer->run(...), $cartItemsDTos);
+        $response = array_map($this->transformer->transform(...), $cartItemsDTos);
 
         return $this->json(['data' => $response]);
     }

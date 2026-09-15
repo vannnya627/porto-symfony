@@ -10,7 +10,7 @@ use App\Ship\Parents\Transformers\Transformer;
 
 final readonly class CartItemTransformer extends Transformer
 {
-    public function run(CartItemDTO $cartItemDTO): CartItemResponse
+    public function transform(CartItemDTO $cartItemDTO): CartItemResponse
     {
         return CartItemResponse::create(
             productId: $cartItemDTO->productId,

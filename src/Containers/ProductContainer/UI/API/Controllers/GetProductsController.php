@@ -43,6 +43,6 @@ final class GetProductsController extends ApiController
     {
         $products = $this->action->run();
 
-        return $this->json(['data' => array_map(callback: $this->transformer->run(...), array: $products)]);
+        return $this->json(['data' => array_map(callback: $this->transformer->transform(...), array: $products)]);
     }
 }

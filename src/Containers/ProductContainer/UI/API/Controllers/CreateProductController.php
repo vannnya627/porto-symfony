@@ -7,6 +7,7 @@ namespace App\Containers\ProductContainer\UI\API\Controllers;
 use App\Containers\ProductContainer\Actions\CreateProductAction;
 use App\Containers\ProductContainer\UI\API\Requests\CreateProductRequest;
 use App\Containers\ProductContainer\UI\API\Responses\ProductResponse;
+use App\Containers\ProductContainer\UI\API\Transformers\ProductTransformer;
 use App\Containers\ProductContainer\Values\ProductValue;
 use App\Ship\Attributes\RateLimiter;
 use App\Ship\DTO\ErrorResponseDTO;
@@ -23,7 +24,10 @@ use Throwable;
 #[Route(path: '/api/v1/product', name: 'api_create_product', methods: ['POST'])]
 final class CreateProductController extends ApiController
 {
-    public function __construct(private readonly CreateProductAction $action) {}
+    public function __construct(
+        private readonly CreateProductAction $action,
+        private readonly ProductTransformer $transformer,
+    ) {}
 
     /**
      * @throws Throwable
@@ -51,8 +55,8 @@ final class CreateProductController extends ApiController
     {
         $value = ProductValue::create(name: $request->name, description: $request->description, price: $request->price);
 
-        $response = ProductResponse::create($this->action->run($value));
+        $product = $this->action->run($value);
 
-        return $this->json($response);
+        return $this->json($this->transformer->transform($product));
     }
 }

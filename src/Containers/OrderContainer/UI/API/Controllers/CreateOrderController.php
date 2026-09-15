@@ -60,6 +60,6 @@ final class CreateOrderController extends ApiController
     {
         $orderDTO = $this->action->run($user->getId());
 
-        return $this->json($this->transformer->run($orderDTO));
+        return $this->json($this->transformer->transform($orderDTO));
     }
 }

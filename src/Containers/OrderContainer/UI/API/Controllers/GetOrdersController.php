@@ -55,6 +55,6 @@ final class GetOrdersController extends ApiController
     {
         $orderDTOs = $this->action->run($user->getId());
 
-        return $this->json(['data' => array_map($this->transformer->run(...), $orderDTOs)]);
+        return $this->json(['data' => array_map($this->transformer->transform(...), $orderDTOs)]);
     }
 }

@@ -10,7 +10,7 @@ use App\Ship\Parents\Transformers\Transformer;
 
 final readonly class OrderItemTransformer extends Transformer
 {
-    public function run(OrderItemDTO $orderItemDTO): OrderItemResponse
+    public function transform(OrderItemDTO $orderItemDTO): OrderItemResponse
     {
         return OrderItemResponse::create($orderItemDTO);
     }

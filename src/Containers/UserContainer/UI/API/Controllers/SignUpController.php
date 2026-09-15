@@ -7,6 +7,7 @@ namespace App\Containers\UserContainer\UI\API\Controllers;
 use App\Containers\UserContainer\Actions\SignUpUserAction;
 use App\Containers\UserContainer\UI\API\Requests\SignUpUserRequest;
 use App\Containers\UserContainer\UI\API\Responses\SignUpUserResponse;
+use App\Containers\UserContainer\UI\API\Transformers\UserTransformer;
 use App\Containers\UserContainer\Values\UserValue;
 use App\Ship\Attributes\RateLimiter;
 use App\Ship\DTO\ErrorResponseDTO;
@@ -22,7 +23,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/v1/auth/signUp', name: 'signUp', methods: ['POST'])]
 final class SignUpController extends ApiController
 {
-    public function __construct(private readonly SignUpUserAction $action) {}
+    public function __construct(
+        private readonly SignUpUserAction $action,
+        private readonly UserTransformer $transformer,
+    ) {}
 
     #[OA\Post(
         operationId: 'signUp',
@@ -51,12 +55,8 @@ final class SignUpController extends ApiController
     )]
     public function __invoke(#[MapRequestPayload] SignUpUserRequest $request): JsonResponse
     {
-        $value = UserValue::create($request->email, $request->password);
+        $value = $this->action->run(UserValue::create($request->email, $request->password));
 
-        $result = $this->action->run($value);
-
-        $response = SignUpUserResponse::create($result);
-
-        return $this->json($response, 201);
+        return $this->json($this->transformer->transform($value), 201);
     }
 }
