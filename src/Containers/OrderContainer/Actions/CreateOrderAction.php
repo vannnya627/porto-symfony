@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Containers\OrderContainer\Actions;
 
-use App\Containers\CartContainer\Data\Entities\CartItem;
+use App\Containers\CartContainer\Managers\PublicValues\CartItemPublicValue;
 use App\Containers\OrderContainer\Data\Entities\Order;
 use App\Containers\OrderContainer\DTOs\OrderDTO;
 use App\Containers\OrderContainer\DTOs\OrderItemDTO;
@@ -29,16 +29,18 @@ final readonly class CreateOrderAction extends Action
     {
         $cart = $this->cartClientManager->findCartWithItemsTask($userId);
 
-        if (null === $cart || $cart->cartItems->isEmpty()) {
+        if (null === $cart || [] === $cart->items) {
             throw new EmptyCartException($cart?->id);
         }
+
         $order = Order::create($userId);
 
-        $productIds = $cart->cartItems->map(fn(CartItem $cartItem) => $cartItem->productId)->toArray();
+        $productIds = array_map(fn(CartItemPublicValue $cartItem) => $cartItem->productId, $cart->items);
+
         $productsDictionary = array_column($this->productClientManager->getProductsByIds($productIds), null, 'id');
 
         $orderItemDTOs = [];
-        foreach ($cart->cartItems as $cartItem) {
+        foreach ($cart->items as $cartItem) {
             $product = $productsDictionary[$cartItem->productId] ?? null;
             if (null !== $product) {
                 $order->addItem($cartItem->productId, $product->name, $cartItem->quantity, $product->price);

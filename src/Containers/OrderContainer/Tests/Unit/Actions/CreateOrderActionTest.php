@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Containers\OrderContainer\Tests\Unit\Actions;
 
 use App\Containers\CartContainer\Data\Entities\Cart;
+use App\Containers\CartContainer\Data\Entities\CartItem;
+use App\Containers\CartContainer\Managers\PublicValues\CartItemPublicValue;
+use App\Containers\CartContainer\Managers\PublicValues\CartPublicValue;
 use App\Containers\OrderContainer\Actions\CreateOrderAction;
 use App\Containers\OrderContainer\Data\Entities\Order;
 use App\Containers\OrderContainer\Events\OrderCreatedEvent;
@@ -55,13 +58,16 @@ final class CreateOrderActionTest extends AbstractTestCase
         $this->setEntityId($cart, 10);
         $cart->addItem(100, Quantity::create(2));
 
+        $cartItem = CartItem::create($cart, 100, Quantity::create(2));
+        $cartPublicValue = CartPublicValue::create(10, [CartItemPublicValue::create($cartItem)]);
+
         $product = Product::create(name: 'Test Product', description: 'Desc', price: Price::create(150));
         $this->setEntityId($product, 100);
 
         $this->cartClientManager->expects($this->once())
             ->method('findCartWithItemsTask')
             ->with($userId)
-            ->willReturn($cart);
+            ->willReturn($cartPublicValue);
 
         $this->productClientManager->expects($this->once())
             ->method('getProductsByIds')
@@ -121,10 +127,12 @@ final class CreateOrderActionTest extends AbstractTestCase
         $cart = Cart::create($userId);
         $this->setEntityId($cart, 1);
 
+        $cartPublicValue = CartPublicValue::create(10, []);
+
         $this->cartClientManager->expects($this->once())
             ->method('findCartWithItemsTask')
             ->with($userId)
-            ->willReturn($cart);
+            ->willReturn($cartPublicValue);
 
         $this->productClientManager->expects($this->never())->method('getProductsByIds');
         $this->saveAndCommitOrderTask->expects($this->never())->method('run');
