@@ -14,7 +14,8 @@ use App\Containers\OrderContainer\Managers\CartClientManager;
 use App\Containers\OrderContainer\Managers\ProductClientManager;
 use App\Containers\OrderContainer\Tasks\SaveAndCommitOrderTask;
 use App\Ship\Parents\Actions\Action;
-use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 final readonly class CreateOrderAction extends Action
 {
@@ -22,9 +23,12 @@ final readonly class CreateOrderAction extends Action
         private CartClientManager $cartClientManager,
         private ProductClientManager $productClientManager,
         private SaveAndCommitOrderTask $saveAndCommitOrderTask,
-        private EventDispatcherInterface $eventDispatcher,
+        private MessageBusInterface $bus,
     ) {}
 
+    /**
+     * @throws ExceptionInterface
+     */
     public function run(int $userId): OrderDTO
     {
         $cart = $this->cartClientManager->findCartWithItemsTask($userId);
@@ -54,7 +58,7 @@ final readonly class CreateOrderAction extends Action
         }
 
         $this->saveAndCommitOrderTask->run($order);
-        $this->eventDispatcher->dispatch(new OrderCreatedEvent($userId));
+        $this->bus->dispatch(new OrderCreatedEvent($userId));
 
         return new OrderDTO(id: $order->id, totalPrice: $order->totalPrice, status: $order->status, orderItemDTOs: $orderItemDTOs);
     }

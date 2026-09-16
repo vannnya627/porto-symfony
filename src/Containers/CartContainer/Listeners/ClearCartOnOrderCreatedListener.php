@@ -9,8 +9,10 @@ use App\Containers\CartContainer\Tasks\SaveAndCommitCartTask;
 use App\Containers\OrderContainer\Events\OrderCreatedEvent;
 use App\Ship\Parents\Listeners\Listener;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsEventListener(event: OrderCreatedEvent::class)]
+// #[AsEventListener(event: OrderCreatedEvent::class)]
+#[AsMessageHandler]
 final readonly class ClearCartOnOrderCreatedListener extends Listener
 {
     public function __construct(

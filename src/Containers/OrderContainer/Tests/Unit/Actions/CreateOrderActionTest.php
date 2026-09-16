@@ -21,7 +21,8 @@ use App\Ship\ValueObjects\Quantity;
 use App\Ship\Parents\Tests\AbstractTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -30,7 +31,7 @@ final class CreateOrderActionTest extends AbstractTestCase
     private CartClientManager|MockObject $cartClientManager;
     private ProductClientManager|MockObject $productClientManager;
     private SaveAndCommitOrderTask|MockObject $saveAndCommitOrderTask;
-    private EventDispatcherInterface|MockObject $eventDispatcher;
+    private MessageBusInterface|MockObject $bus;
     private CreateOrderAction $action;
 
     protected function setUp(): void
@@ -38,13 +39,13 @@ final class CreateOrderActionTest extends AbstractTestCase
         $this->cartClientManager = $this->createMock(CartClientManager::class);
         $this->productClientManager = $this->createMock(ProductClientManager::class);
         $this->saveAndCommitOrderTask = $this->createMock(SaveAndCommitOrderTask::class);
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->bus = $this->createMock(MessageBusInterface::class);
 
         $this->action = new CreateOrderAction(
             $this->cartClientManager,
             $this->productClientManager,
             $this->saveAndCommitOrderTask,
-            $this->eventDispatcher,
+            $this->bus,
         );
     }
 
@@ -84,9 +85,11 @@ final class CreateOrderActionTest extends AbstractTestCase
                 $this->setEntityId($order, 99);
             });
 
-        $this->eventDispatcher->expects($this->once())
+        $this->bus->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(OrderCreatedEvent::class));
+            ->with($this->isInstanceOf(OrderCreatedEvent::class))
+            ->willReturnCallback(fn($event) => new Envelope($event));
+
 
         $result = $this->action->run($userId);
 
@@ -112,7 +115,7 @@ final class CreateOrderActionTest extends AbstractTestCase
 
         $this->productClientManager->expects($this->never())->method('getProductsByIds');
         $this->saveAndCommitOrderTask->expects($this->never())->method('run');
-        $this->eventDispatcher->expects($this->never())->method('dispatch');
+        $this->bus->expects($this->never())->method('dispatch');
 
         $this->expectException(EmptyCartException::class);
         $this->action->run($userId);
@@ -136,7 +139,7 @@ final class CreateOrderActionTest extends AbstractTestCase
 
         $this->productClientManager->expects($this->never())->method('getProductsByIds');
         $this->saveAndCommitOrderTask->expects($this->never())->method('run');
-        $this->eventDispatcher->expects($this->never())->method('dispatch');
+        $this->bus->expects($this->never())->method('dispatch');
 
         $this->expectException(EmptyCartException::class);
         $this->action->run($userId);

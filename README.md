@@ -23,6 +23,11 @@ docker compose exec php-fpm php bin/console lexik:jwt:generate-keypair --skip-if
 docker compose exec php-fpm php bin/console doctrine:migrations:migrate --no-interaction
 ```
 ---
+### Check worker logs:
+```
+docker-compose logs -f worker
+```
+---
 ### Check the documentation: http://localhost/api/doc or http://localhost/api/doc.json 
 ### Check Symfony Profiler: http://localhost/_profiler
 

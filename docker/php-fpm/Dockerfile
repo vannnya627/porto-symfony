@@ -15,6 +15,7 @@ RUN chmod +x /usr/local/bin/install-php-extensions
         redis \
         excimer \
         pcov \
+        amqp \
         @composer
 
     WORKDIR /var/www/project

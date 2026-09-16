@@ -48,9 +48,39 @@ services:
             timeout: 5s
             retries: 5
 
+    rabbitmq:
+        image: rabbitmq:3.13-management-alpine
+        environment:
+            - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+            - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        volumes:
+            - rabbitmq_data:/var/lib/rabbitmq
+        networks:
+            - app-network
+
+    worker:
+        build:
+            context: .
+            dockerfile: docker/php-fpm/Dockerfile
+        volumes:
+            - .:/var/www/project
+        command: php bin/console messenger:consume async -vv
+        depends_on:
+            rabbitmq:
+                condition: service_started
+            mysql:
+                condition: service_healthy
+        networks:
+            - app-network
+        restart: always
+
 networks:
     app-network:
         driver: bridge
 
 volumes:
     mysql_data:
+    rabbitmq_data:
