@@ -67,7 +67,7 @@ services:
             dockerfile: docker/php-fpm/Dockerfile
         volumes:
             - .:/var/www/project
-        command: php bin/console messenger:consume async -vv
+        command: php bin/console messenger:consume outbox -vv
         depends_on:
             rabbitmq:
                 condition: service_started

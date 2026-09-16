@@ -7,7 +7,7 @@ namespace App\Containers\OrderContainer\Events;
 use App\Ship\Parents\Events\Event;
 use Symfony\Component\Messenger\Attribute\AsMessage;
 
-#[AsMessage('async')]
+#[AsMessage('outbox')]
 final readonly class OrderCreatedEvent extends Event
 {
     public function __construct(
