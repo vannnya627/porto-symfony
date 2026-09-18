@@ -9,6 +9,7 @@ use App\Containers\UserContainer\UI\API\Requests\LoginRequest;
 use App\Containers\UserContainer\UI\API\Responses\LoginUserResponse;
 use App\Containers\UserContainer\UI\API\Transformers\LoginValueTransformer;
 use App\Containers\UserContainer\Values\UserValue;
+use App\Ship\Attributes\RateLimiter;
 use App\Ship\DTO\ErrorResponseDTO;
 use App\Ship\Parents\Controllers\ApiController;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -18,6 +19,7 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[OA\Tag('AuthController')]
+#[RateLimiter(policy: 'auth')]
 #[Route('/api/v1/auth/login', name: 'login', methods: ['POST'])]
 final class LoginController extends ApiController
 {
