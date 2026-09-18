@@ -44,4 +44,9 @@ final class UserRepository extends Repository implements PasswordUpgraderInterfa
     {
         return $this->count(['email.value' => $email->value]) > 0;
     }
+
+    public function findByEmail(Email $email): ?User
+    {
+        return $this->findOneBy(['email.value' => $email->value]);
+    }
 }
