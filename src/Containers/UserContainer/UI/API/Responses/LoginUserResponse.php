@@ -13,10 +13,11 @@ final readonly class LoginUserResponse extends Response
         public int $userId,
         public string $email,
         public string $token,
+        public string $refreshToken,
     ) {}
 
     public static function create(LoginValue $value): self
     {
-        return new self(userId: $value->userId, email: $value->email, token: $value->token);
+        return new self(userId: $value->userId, email: $value->email, token: $value->token, refreshToken: $value->refreshToken);
     }
 }

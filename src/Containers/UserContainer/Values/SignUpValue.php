@@ -12,10 +12,11 @@ final readonly class SignUpValue extends Value
         public int $userId,
         public string $email,
         public string $token,
+        public string $refreshToken,
     ) {}
 
-    public static function create(int $userId, string $email, string $token): self
+    public static function create(int $userId, string $email, string $token, string $refreshToken): self
     {
-        return new self(userId: $userId, email: $email, token: $token);
+        return new self(userId: $userId, email: $email, token: $token, refreshToken: $refreshToken);
     }
 }

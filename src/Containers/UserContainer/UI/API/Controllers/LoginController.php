@@ -16,6 +16,7 @@ use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[OA\Tag('AuthController')]
@@ -28,6 +29,9 @@ final class LoginController extends ApiController
         private readonly LoginValueTransformer $transformer,
     ) {}
 
+    /**
+     * @throws ExceptionInterface
+     */
     #[OA\Post(
         operationId: 'login',
         description: 'Вхід користувача',

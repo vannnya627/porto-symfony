@@ -13,6 +13,7 @@ parameters:
         App\Containers\ProductContainer\Exceptions\ProductNotFoundException: { type: 'product-not-found', code: 404, loggable: false }
         App\Containers\OrderContainer\Exceptions\EmptyCartException: { type: 'cart-is-empty', code: 422, loggable: false }
         App\Containers\UserContainer\Exceptions\InvalidCredentialsException: { type: 'invalid-credentials', code: 401, loggable: false }
+        App\Containers\UserContainer\Exceptions\InvalidRefreshTokenException: { type: 'invalid-refresh-token', code: 401, loggable: false }
 
 services:
     # default configuration for services in *this* file
